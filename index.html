@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Happy Birthday Achuu!</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            /* Initial state: no scrolling until gift opens */
+            overflow: hidden; 
+            margin: 0;
+            padding: 0;
+            background: #0f0c29; 
+            background: linear-gradient(to bottom, #24243e, #302b63, #0f0c29);
+            color: white;
+        }
+        
+        .cursive-font {
+            font-family: 'Dancing Script', cursive;
+        }
+
+        /* --- Background Elements (Fixed) --- */
+        .fixed-bg-element {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        .liquid-bg {
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 200vmax;
+            height: 200vmax;
+            background: 
+                radial-gradient(circle at 30% 30%, rgba(255, 105, 180, 0.4) 0%, transparent 50%),
+                radial-gradient(circle at 70% 70%, rgba(100, 149, 237, 0.4) 0%, transparent 50%),
+                radial-gradient(circle at 20% 80%, rgba(255, 215, 0, 0.4) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(0, 255, 255, 0.4) 0%, transparent 50%);
+            filter: blur(80px);
+            opacity: 0.7;
+            animation: liquidMove 25s ease-in-out infinite alternate;
+            z-index: 1;
+        }
+
+        @keyframes liquidMove {
+            0% { transform: translate(-50%, -50%) rotate(0deg) scale(1); }
+            50% { transform: translate(-50%, -50%) rotate(10deg) scale(1.1); }
+            100% { transform: translate(-50%, -50%) rotate(-10deg) scale(0.9); }
+        }
+
+        #confetti-canvas { z-index: 50; }
+        #hearts-container { z-index: 2; }
+
+        /* Glassmorphism */
+        .glass {
+            background: rgba(255, 255, 255, 0.05);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%);
+        }
+
+        .glass-note {
+            background: rgba(20, 20, 20, 0.4); /* Slightly darker for text readability */
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            backdrop-filter: blur(16px);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .glass-button {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+        
+        .glass-button:hover {
+            background: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 0 15px rgba(255, 105, 180, 0.4);
+        }
+
+        /* Floating Hearts */
+        .heart {
+            position: absolute;
+            color: rgba(255, 255, 255, 0.5);
+            animation: float 7s linear infinite;
+            bottom: -20px;
+            height: 100vh; 
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0) rotate(0deg) scale(0.8); opacity: 0.8; }
+            100% { transform: translateY(-100%) rotate(360deg) scale(1.2); opacity: 0; }
+        }
+
+        /* Gift Box */
+        .gift-container {
+            cursor: pointer;
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .gift-container:hover { transform: scale(1.1); }
+        .bounce-gift { animation: bounceGift 2.5s infinite cubic-bezier(0.455, 0.03, 0.515, 0.955); }
+        @keyframes bounceGift {
+            0%, 20%, 50%, 80%, 100% {transform: translateY(0);}
+            40% {transform: translateY(-25px);}
+            60% {transform: translateY(-12px);}
+        }
+
+        /* Emojis Bounce */
+        .bounce-emoji {
+            animation: bounceEmoji 2s infinite ease-in-out;
+            display: inline-block;
+        }
+        @keyframes bounceEmoji {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+        
+        /* Scroll Prompt */
+        .animate-bounce-slow { animation: bounceSlow 2s infinite; }
+        @keyframes bounceSlow {
+            0%, 100% { transform: translateY(0); opacity: 0.8; }
+            50% { transform: translateY(10px); opacity: 0.4;}
+        }
+
+        /* Reveal Animations */
+        .fade-in-up {
+            animation: fadeInUp 1s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+            opacity: 0;
+            transform: translateY(40px);
+        }
+        @keyframes fadeInUp { to { opacity: 1; transform: translateY(0); } }
+
+        .pop-out { animation: popOut 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
+        @keyframes popOut { 0% { transform: scale(0.5); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+    </style>
+</head>
+<body class="min-h-screen relative">
+
+    <!-- Background Elements (Fixed) -->
+    <div class="fixed-bg-element liquid-bg"></div>
+    <div id="hearts-container" class="fixed-bg-element overflow-hidden"></div>
+    <canvas id="confetti-canvas" class="fixed-bg-element"></canvas>
+
+    <!-- Scene 1: The Glass Gift Box (Fixed Center initially) -->
+    <div id="gift-scene" class="fixed inset-0 z-20 flex flex-col items-center justify-center transition-all duration-700">
+        <div class="text-white/80 text-xl font-semibold mb-10 animate-pulse tracking-widest glass px-6 py-2 rounded-full">
+            Tap to Unlock Surprise
+        </div>
+        
+        <div class="gift-container bounce-gift relative w-48 h-48" onclick="openGift()">
+            <!-- Glass Box Body -->
+            <div class="absolute bottom-0 w-full h-36 rounded-xl z-10 glass overflow-hidden">
+                <div class="absolute top-0 left-0 w-full h-1/2 bg-gradient-to-b from-white/20 to-transparent"></div>
+                <div class="absolute left-1/2 -translate-x-1/2 w-10 h-full bg-rose-500/70 shadow-sm"></div>
+                <div class="absolute top-1/2 -translate-y-1/2 w-full h-10 bg-rose-500/70 shadow-sm"></div>
+            </div>
+            <!-- Glass Lid -->
+            <div class="absolute -top-8 left-1/2 -translate-x-1/2 w-52 h-12 z-20 rounded-lg glass overflow-hidden">
+                <div class="absolute left-1/2 -translate-x-1/2 w-10 h-full bg-rose-500/70 shadow-sm"></div>
+            </div>
+            <!-- Bow -->
+            <div class="absolute -top-20 left-1/2 -translate-x-1/2 z-30">
+                <div class="relative drop-shadow-lg">
+                    <div class="absolute top-6 left-0 w-14 h-14 border-4 border-rose-400 rounded-full transform -translate-x-7 rotate-45 bg-rose-500/30 backdrop-blur-md"></div>
+                    <div class="absolute top-6 right-0 w-14 h-14 border-4 border-rose-400 rounded-full transform translate-x-7 -rotate-45 bg-rose-500/30 backdrop-blur-md"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Scrollable Content Container (Initially Hidden) -->
+    <div id="main-content" class="hidden relative z-30 w-full">
+        
+        <!-- Section 1: The Liquid Glass Wish Card (Full Screen Height) -->
+        <section class="min-h-screen flex flex-col items-center justify-center p-4">
+            <div id="wish-card" class="glass p-8 md:p-12 max-w-md w-full mx-auto text-center pop-out relative overflow-hidden mb-8">
+                <div class="absolute inset-0 bg-gradient-to-tr from-white/10 via-transparent to-white/5 pointer-events-none"></div>
+
+                <!-- Bouncing Emojis -->
+                <div class="flex justify-center items-center gap-2 md:gap-4 mb-8">
+                    <div class="text-5xl md:text-6xl bounce-emoji drop-shadow-xl" style="animation-delay: 0s;">🎂</div>
+                    <div class="text-5xl md:text-6xl bounce-emoji drop-shadow-xl" style="animation-delay: 0.2s;">🐢</div>
+                    <div class="text-5xl md:text-6xl bounce-emoji drop-shadow-xl" style="animation-delay: 0.4s;">🤍</div>
+                    <div class="text-5xl md:text-6xl bounce-emoji drop-shadow-xl" style="animation-delay: 0.6s;">🐣</div>
+                </div>
+                
+                <h1 class="text-5xl md:text-6xl text-transparent bg-clip-text bg-gradient-to-r from-pink-400 to-purple-300 cursive-font mb-4 leading-tight drop-shadow-lg fade-in-up" style="animation-delay: 0.3s;">
+                    Happy Birthday
+                </h1>
+                <h2 class="text-4xl md:text-5xl text-white cursive-font mb-6 drop-shadow-md fade-in-up" style="animation-delay: 0.6s;">
+                    Achuu Kuttyyyy
+                </h2>
+                <div class="text-5xl md:text-6xl fade-in-up drop-shadow-xl" style="animation-delay: 0.9s;">
+                    🥹🫶🏻
+                </div>
+                
+                <p class="mt-8 text-pink-200/90 font-semibold text-xl md:text-2xl opacity-0 fade-in-up tracking-wide drop-shadow-sm" style="animation-delay: 1.3s;">
+                     Love you achuveyy forever 🥰
+                </p>
+            </div>
+
+            <!-- Scroll Prompt -->
+            <div class="text-white/70 animate-bounce-slow flex flex-col items-center text-sm font-semibold fade-in-up" style="animation-delay: 2s;">
+                <span class="mb-2">Scroll Down for a Note ↓</span>
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+                </svg>
+            </div>
+        </section>
+
+        <!-- Section 2: The Note -->
+        <section class="min-h-screen flex flex-col items-center justify-center p-4 pb-20">
+            <div class="glass-note p-8 md:p-10 max-w-2xl w-full mx-auto relative overflow-hidden fade-in-up" style="animation-delay: 0.2s">
+                 <!-- Decorative Quote Icon -->
+                 <div class="absolute top-4 left-6 text-6xl text-white/10 font-serif">“</div>
+                 
+                 <div class="text-white/90 text-lg md:text-xl leading-relaxed space-y-4 font-light tracking-wide text-center md:text-left">
+                    <p>Achuveyy Happy Birthday 🥹🫶🏻.</p>
+                    <p>Thank you for the love you have showed to me. Palappozhum njn pala reethiyil sangadapeduthiyittund 🥲. Still you loved me. Njn parayandathath paranjittund. Still you were there for me.</p>
+                    <p>I didn't know that a person like you existed. Love you so much 🥹. We both have gone through a lot this yr.. Some were good some were bad and God helped us.</p>
+                    <p>Ninte agraham pole you will become a doctor 🥹. Ath nte kude aaghraham aan.. You are the best 🫶🏻. You have the potential to become the best doctor 🥹. Ni ippol cheyyunne hardwork onnum verthe aavula. Nannayi padikkuka, athe pole health um nokkuka 🫂.</p>
+                    <p>If you ever feel low just tell me I will be always there for you. Whatever maybe the problems or anything I will be there with you.</p>
+                    <p>Wishing you a year full of smiles, good moments, and everything that makes you happy 😊. Thank you for being there for me. Enk ariya how much you have done for me 🥹🫶🏻.</p>
+                    <p>You tried your best for me 😭. No one else would ever do that. You have got a good soul 🤍. Njn ntha paraya you are the best dii 🥹😭🫶🏻.</p>
+                    <p>Will be there for you always and I'm thankful to God 💙🤲🏻 for helping me to find you.</p>
+                 </div>
+
+                 <div class="absolute bottom-0 right-6 text-6xl text-white/10 font-serif rotate-180">“</div>
+            </div>
+
+            <button onclick="replay()" class="mt-12 px-8 py-3 glass-button text-white/90 font-semibold rounded-full shadow-lg hover:text-white transition-all fade-in-up flex items-center justify-center mx-auto gap-2" style="animation-delay: 0.5s;">
+                <span>Replay Moment</span>
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+            </button>
+        </section>
+
+    </div>
+
+    <script>
+        // Configuration
+        const confettiCanvas = document.getElementById('confetti-canvas');
+        const ctx = confettiCanvas.getContext('2d');
+        const mainContent = document.getElementById('main-content');
+        const giftScene = document.getElementById('gift-scene');
+        let confetti = [];
+        let animationId;
+
+        // Resize canvas
+        function resizeCanvas() {
+            confettiCanvas.width = window.innerWidth;
+            confettiCanvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        // Heart Background Generator
+        function createHeart() {
+            const heart = document.createElement('div');
+            heart.classList.add('heart');
+            heart.innerHTML = Math.random() > 0.5 ? '❤' : '🤍';
+            heart.style.left = Math.random() * 100 + 'vw';
+            heart.style.fontSize = Math.random() * 25 + 15 + 'px';
+            heart.style.animationDuration = Math.random() * 4 + 5 + 's';
+            heart.style.opacity = Math.random() * 0.5 + 0.3;
+            document.getElementById('hearts-container').appendChild(heart);
+            setTimeout(() => { heart.remove(); }, 9000);
+        }
+        setInterval(createHeart, 400);
+
+        // Confetti Logic
+        function createConfetti() {
+            const colors = ['#ff69b4', '#ffd700', '#87ceeb', '#ff4500', '#da70d6'];
+            for (let i = 0; i < 180; i++) {
+                confetti.push({
+                    x: window.innerWidth / 2,
+                    y: window.innerHeight / 2,
+                    r: Math.random() * 8 + 3,
+                    dx: Math.random() * 14 - 7,
+                    dy: Math.random() * 14 - 7,
+                    color: colors[Math.floor(Math.random() * colors.length)],
+                    gravity: 0.15,
+                    drag: 0.95
+                });
+            }
+        }
+
+        function updateConfetti() {
+            ctx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+            confetti.forEach((p, index) => {
+                p.x += p.dx; p.y += p.dy; p.dy += p.gravity; p.dx *= p.drag; p.dy *= p.drag;
+                ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2); ctx.fillStyle = p.color; ctx.fill();
+                if (p.y > window.innerHeight + 50) { confetti.splice(index, 1); }
+            });
+            if (confetti.length > 0) { animationId = requestAnimationFrame(updateConfetti); }
+        }
+
+        // Interactions
+        function openGift() {
+            document.body.style.overflow = 'auto'; // Enable scroll
+
+            // Animate gift out
+            giftScene.style.transform = 'scale(1.5)';
+            giftScene.style.opacity = '0';
+            
+            setTimeout(() => {
+                giftScene.classList.add('hidden');
+                mainContent.classList.remove('hidden');
+                
+                createConfetti(); updateConfetti();
+                setTimeout(createConfetti, 200);
+                setTimeout(createConfetti, 400);
+            }, 400);
+        }
+
+        function replay() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            setTimeout(() => {
+                 document.body.style.overflow = 'hidden';
+                 mainContent.classList.add('hidden');
+                 giftScene.classList.remove('hidden');
+                 giftScene.style.transform = 'scale(1)';
+                 giftScene.style.opacity = '1';
+                 
+                 confetti = [];
+                 cancelAnimationFrame(animationId);
+                 ctx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+            }, 600); 
+        }
+    </script>
+</body>
+</html>
